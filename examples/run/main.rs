@@ -20,7 +20,6 @@ use matrix_engine::{
         renderer_plugin::RendererPlugin,
     },
 };
-use num_traits::Signed;
 use winit::keyboard::KeyCode;
 
 struct Example1;
@@ -46,9 +45,9 @@ impl<CustomEvents: MatrixEventable> Plugin<CustomEvents> for Example1 {
             |render_objs: &mut WriteC<RenderObject>,
              transforms: &mut WriteC<Transform>,
              camera: &mut WriteR<Camera, CustomEvents>| {
-                for i in 0..10 {
-                    for y in 0..10 {
-                        for z in 0..10 {
+                for i in 0..100 {
+                    for y in 0..100 {
+                        for z in 0..100 {
                             let e = Entity::new();
                             render_objs.insert(e, RenderObject::new(Cube, "./img.jpg".to_string()));
                             transforms.insert(
@@ -120,8 +119,8 @@ impl<CustomEvents: MatrixEventable> Plugin<CustomEvents> for Example1 {
                     let (x, y) = events.mouse_dx();
                     yaw += x * rotation_speed;
                     pitch -= y * rotation_speed;
-                    
-                    pitch = pitch.clamp(-PI/2.+0.01, PI/2.-0.01);
+
+                    pitch = pitch.clamp(-PI / 2. + 0.01, PI / 2. - 0.01);
                     // Update the camera's direction (yaw and pitch)
                     let (sin_yaw, cos_yaw) = yaw.sin_cos();
                     let (sin_pitch, cos_pitch) = pitch.sin_cos();
@@ -145,12 +144,9 @@ impl<CustomEvents: MatrixEventable> Plugin<CustomEvents> for Example1 {
                 }
                 if is_on {
                     let dt = events.dt();
-                    (transforms.iter_mut(), obj.iter())
-                        .into_wrapper()
-                        .for_each(|(_, (t, _))| {
-                            *t.rotation.x_mut() += dt * 1.;
-                            t.update_raw();
-                        });
+                    for (_, (t, _)) in (transforms.iter_mut(), obj.iter()).into_wrapper() {
+                        *t.rotation.y_mut() += dt * 1.;
+                    }
                 }
             },
         );
